@@ -1,24 +1,26 @@
-name:                yesod-auth-jwt
-version:             0.1.0.0
-synopsis:            Initial project template from stack
-description:         Please see README.md
-homepage:            https://github.com/whittle/yesod-auth-jwt#readme
-license:             BSD3
-license-file:        LICENSE
-author:              Jason Whittle
-maintainer:          jason.whittle@gmail.com
-copyright:           Copyright (c) 2016 Jason A. Whittle
-category:            Yesod
-build-type:          Simple
--- extra-source-files:
-cabal-version:       >=1.10
+name:                   yesod-auth-jwt
+version:                0.1.0.0
+synopsis:               Yesod authentication using JSON Web Tokens
+homepage:               https://github.com/whittle/yesod-auth-jwt
+license:                BSD3
+license-file:           LICENSE
+author:                 Jason Whittle
+maintainer:             jason.whittle@gmail.com
+copyright:              Copyright (c) 2016 Jason A. Whittle
+category:               Yesod
+build-type:             Simple
+cabal-version:          >=1.10
+description:            Please see README.md
+
+extra-source-files:     LICENSE
+                      , stack.yaml
 
 library
-  hs-source-dirs:      src
-  exposed-modules:     Lib
-  build-depends:       base >= 4.7 && < 5
-  default-language:    Haskell2010
+  default-language:     Haskell2010
+  build-depends:        base >= 4.7 && < 5
+  hs-source-dirs:       src
+  exposed-modules:      Lib
 
 source-repository head
-  type:     git
-  location: https://github.com/whittle/yesod-auth-jwt
+  type:                 git
+  location:             https://github.com/whittle/yesod-auth-jwt
