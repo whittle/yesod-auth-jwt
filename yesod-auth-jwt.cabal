@@ -13,6 +13,7 @@ cabal-version:          >=1.10
 description:            Please see README.md
 
 extra-source-files:     LICENSE
+                      , README.md
                       , stack.yaml
 
 library
