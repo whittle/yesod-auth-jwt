@@ -29,7 +29,7 @@ newtype CachedBearerTokenAuthId a = CachedBearerTokenAuthId { unCached :: Maybe 
 -- | A pair of functions to validate user bearer token
 data TokenValidator = TokenValidator
                     { validateToken :: ByteString -> IO Bool
-                    , extractSubject :: ByteString -> Text
+                    , extractSubject :: ByteString -> Maybe Text
                     }
 
 
@@ -65,5 +65,5 @@ maybeBearerTokenAuthId TokenValidator{..} req =
     authorizeCredentials token = do
       authorized <- liftIO $ validateToken token
       return $ if authorized
-               then Just $ extractSubject token
+               then extractSubject token
                else Nothing
