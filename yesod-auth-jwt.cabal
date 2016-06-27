@@ -23,6 +23,7 @@ library
                       , bytestring >= 0.10
                       , data-default >= 0.5
                       , exceptions >= 0.8
+                      , http-types >= 0.9
                       , jose >= 0.4
                       , monad-control >= 1.0
                       , text >= 1.2
@@ -30,9 +31,11 @@ library
                       , wai >= 3.2
                       , word8 >= 0.1
                       , yesod-core >= 1.4
+                      , yesod-test >= 1.5
   hs-source-dirs:       src
   exposed-modules:      Yesod.Auth.Http.BearerToken
                       , Yesod.Auth.JOSE.TokenValidator
+                      , Yesod.Test.Auth.JWTHelper
 
 source-repository head
   type:                 git
