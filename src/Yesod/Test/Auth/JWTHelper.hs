@@ -15,9 +15,9 @@ import           Data.Monoid ((<>))
 import           Data.Text (Text)
 import           Network.HTTP.Types.Header
 import           Yesod.Core (Yesod)
-import qualified Yesod.Test as Y
+import qualified Yesod.Test.Mock as Y
 
-requestWithSubject :: Yesod site => JWK -> Text -> Y.RequestBuilder site () -> Y.YesodExample site ()
+requestWithSubject :: Yesod site => JWK -> Text -> Y.RequestBuilder site () -> Y.YesodExample site mocks ()
 requestWithSubject jwk subject builder = do
   jwt <- liftIO . J.createJWSJWT jwk jwsHeader $ newClaimsSet subject
   jwt' <- fromRight "Can’t create JWT" jwt
@@ -35,8 +35,8 @@ bearerTokenAuthHeader jwt = (hAuthorization, "Bearer " <> jwt)
 newClaimsSet :: Text -> J.ClaimsSet
 newClaimsSet subject = J.emptyClaimsSet { J._claimSub = Just $ J.fromString subject }
 
-fromRight :: String -> Either a b -> Y.YesodExample site b
+fromRight :: String -> Either a b -> Y.YesodExample site mocks b
 fromRight msg = either (const $ assertFailure msg) pure
 
-assertFailure :: String -> Y.YesodExample site b
+assertFailure :: String -> Y.YesodExample site mocks b
 assertFailure msg = Y.assertEqual msg True False >> error "assertFailure skipped, somehow"
