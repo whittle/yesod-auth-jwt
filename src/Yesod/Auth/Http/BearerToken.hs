@@ -9,7 +9,7 @@ module Yesod.Auth.Http.BearerToken
        ) where
 
 import           Control.Monad.Catch (MonadThrow)
-import           Control.Monad.IO.Class (liftIO, MonadIO)
+import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
@@ -27,10 +27,10 @@ newtype CachedBearerTokenAuthId a = CachedBearerTokenAuthId { unCached :: Maybe 
 
 
 -- | A pair of functions to validate user bearer token
-data TokenValidator = TokenValidator
-                    { validateToken :: ByteString -> IO Bool
-                    , extractSubject :: ByteString -> Maybe Text
-                    }
+data TokenValidator m = TokenValidator
+                      { validateToken :: ByteString -> m Bool
+                      , extractSubject :: ByteString -> Maybe Text
+                      }
 
 
 -- | Retrieve the 'AuthId' using Authorization header.
@@ -38,7 +38,7 @@ data TokenValidator = TokenValidator
 -- If valid credentials are found and authorized the auth id is
 -- cached.
 defaultMaybeBearerTokenAuthId :: (MonadIO m, MonadThrow m, MonadBaseControl IO m)
-                              => TokenValidator -> HandlerT site m (Maybe Text)
+                              => TokenValidator (HandlerT site m) -> HandlerT site m (Maybe Text)
 defaultMaybeBearerTokenAuthId auth =
   cachedAuth $ waiRequest >>= maybeBearerTokenAuthId auth
 
@@ -51,7 +51,7 @@ cachedAuth = fmap unCached . cached . fmap CachedBearerTokenAuthId
 
 -- | Use the bearer token in the HTTP _Authorization_ header to
 -- retrieve the AuthId of request
-maybeBearerTokenAuthId :: MonadIO m => TokenValidator -> Request -> m (Maybe Text)
+maybeBearerTokenAuthId :: MonadIO m => TokenValidator (HandlerT site m) -> Request -> HandlerT site m (Maybe Text)
 maybeBearerTokenAuthId TokenValidator{..} req =
   case authorization of
    Just (strategy, token)
@@ -63,7 +63,7 @@ maybeBearerTokenAuthId TokenValidator{..} req =
     authorization = BS.break isSpace
                 <$> lookup "Authorization" (requestHeaders req)
     authorizeCredentials token = do
-      authorized <- liftIO $ validateToken token
+      authorized <- validateToken token
       return $ if authorized
                then extractSubject token
                else Nothing
