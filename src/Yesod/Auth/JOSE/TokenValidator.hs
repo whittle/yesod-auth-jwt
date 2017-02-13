@@ -14,13 +14,13 @@ import           Data.Default (def)
 import           Data.Text (Text)
 import           Yesod.Auth.Http.BearerToken (TokenValidator(..))
 
-defaultTokenValidator :: JWK -> TokenValidator
+defaultTokenValidator :: Applicative m => JWK -> TokenValidator m
 defaultTokenValidator k = TokenValidator { validateToken = defaultValidateToken k
                                          , extractSubject = defaultExtractSubject
                                          }
 
-defaultValidateToken :: JWK -> ByteString -> IO Bool
-defaultValidateToken jwk = return . either (const False) vfy . decodeCompact . fromStrict
+defaultValidateToken :: Applicative m => JWK -> ByteString -> m Bool
+defaultValidateToken jwk = pure . either (const False) vfy . decodeCompact . fromStrict
   where vfy = verifyJWS def def jwk
 
 defaultExtractSubject :: ByteString -> Maybe Text
