@@ -25,7 +25,9 @@ library
                       , exceptions >= 0.8
                       , http-types >= 0.9
                       , jose >= 0.4
+                      , lens
                       , monad-control >= 1.0
+                      , monad-time
                       , text >= 1.2
                       , transformers >= 0.4
                       , wai >= 3.2

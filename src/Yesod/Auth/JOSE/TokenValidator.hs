@@ -1,28 +1,24 @@
 module Yesod.Auth.JOSE.TokenValidator
-       ( defaultExtractSubject
-       , defaultTokenValidator
-       , defaultValidateToken
+       ( extractValidatedSubject
        ) where
 
+import           Control.Lens
+import           Control.Monad.Time (MonadTime)
+import           Control.Monad.Trans.Except (runExceptT)
 import           Crypto.JOSE.Compact
 import           Crypto.JOSE.JWK
-import           Crypto.JOSE.JWS
 import           Crypto.JWT
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Lazy (fromStrict)
-import           Data.Default (def)
 import           Data.Text (Text)
-import           Yesod.Auth.Http.BearerToken (TokenValidator(..))
+import           Yesod.Core.Types (HandlerT)
 
-defaultTokenValidator :: Applicative m => JWK -> TokenValidator m
-defaultTokenValidator k = TokenValidator { validateToken = defaultValidateToken k
-                                         , extractSubject = defaultExtractSubject
-                                         }
-
-defaultValidateToken :: Applicative m => JWK -> ByteString -> m Bool
-defaultValidateToken jwk = pure . either (const False) vfy . decodeCompact . fromStrict
-  where vfy = verifyJWS def def jwk
-
-defaultExtractSubject :: ByteString -> Maybe Text
-defaultExtractSubject = either (const Nothing) ext . decodeCompact . fromStrict
-  where ext = (getString =<<) . _claimSub . jwtClaimsSet
+extractValidatedSubject :: (Monad m, MonadTime m) => JWK -> ByteString -> HandlerT site m (Maybe Text)
+extractValidatedSubject jwk compactToken = do
+  result <- runExceptT $ do
+    jwt <- decodeCompact $ fromStrict compactToken
+    validateJWSJWT defaultJWTValidationSettings jwk jwt
+    return $ jwtClaimsSet jwt
+  case result of
+    Left e -> return (e :: JWTError) >> return Nothing
+    Right claims -> return $ claims^.claimSub >>= getString
