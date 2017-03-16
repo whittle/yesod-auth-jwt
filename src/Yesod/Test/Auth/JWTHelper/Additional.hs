@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Yesod.Test.Auth.JWTHelper.Stateful
+module Yesod.Test.Auth.JWTHelper.Additional
        ( requestWithSubject
        ) where
 
@@ -16,9 +16,9 @@ import           Data.Monoid ((<>))
 import           Data.Text (Text)
 import           Network.HTTP.Types.Header
 import           Yesod.Core (Yesod)
-import qualified Yesod.Test.Stateful as Y
+import qualified Yesod.Test.Additional as Y
 
-requestWithSubject :: Yesod site => JWK -> Text -> Y.RequestBuilder site () -> Y.YesodExample site ctx ()
+requestWithSubject :: Yesod site => JWK -> Text -> Y.RequestBuilder site () -> Y.YesodExample site addl ()
 requestWithSubject jwk subject builder = do
   result <- runExceptT $ do
     let header = newJWSHeader (Protected, HS256)

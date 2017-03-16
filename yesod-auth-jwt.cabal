@@ -34,13 +34,13 @@ library
                       , word8 >= 0.1
                       , yesod-core >= 1.4
                       , yesod-test >= 1.5
-                      , yesod-test-stateful >= 0.1
+                      , yesod-test-additional >= 1.5.5
 
   hs-source-dirs:       src
   exposed-modules:      Yesod.Auth.Http.BearerToken
                       , Yesod.Auth.JOSE.TokenValidator
                       , Yesod.Test.Auth.JWTHelper
-                      , Yesod.Test.Auth.JWTHelper.Stateful
+                      , Yesod.Test.Auth.JWTHelper.Additional
 
 source-repository head
   type:                 git

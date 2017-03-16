@@ -22,7 +22,7 @@ packages:
 - '.'
 - location:
     git: git@github.com:whittle/yesod-test-stateful.git
-    commit: 9ceba9d736f1efe2bb19a9da6c1753438f3ae149
+    commit: aeabff270fd24da2877e730f2a77909c774bc051
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
