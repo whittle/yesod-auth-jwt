@@ -18,12 +18,13 @@ import           Yesod.Core.Types (HandlerT)
 
 extractValidatedSubject :: (Monad m, MonadTime m)
                         => JWK
+                        -> JWTValidationSettings
                         -> ByteString
                         -> HandlerT site m (Either Text Text)
-extractValidatedSubject jwk compactToken = do
+extractValidatedSubject jwk config compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
-    validateJWSJWT defaultJWTValidationSettings jwk jwt
+    validateJWSJWT config jwk jwt
     return $ jwtClaimsSet jwt
   return $ case result of
     Left e -> Left $ pack $ show (e :: JWTError)
