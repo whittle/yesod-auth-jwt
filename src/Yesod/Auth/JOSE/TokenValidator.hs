@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Yesod.Auth.JOSE.TokenValidator
        ( extractValidatedSubject
        ) where
@@ -10,15 +12,23 @@ import           Crypto.JOSE.JWK
 import           Crypto.JWT
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Lazy (fromStrict)
-import           Data.Text (Text)
+import           Data.Text (pack, Text)
 import           Yesod.Core.Types (HandlerT)
 
-extractValidatedSubject :: (Monad m, MonadTime m) => JWK -> ByteString -> HandlerT site m (Maybe Text)
+
+extractValidatedSubject :: (Monad m, MonadTime m)
+                        => JWK
+                        -> ByteString
+                        -> HandlerT site m (Either Text Text)
 extractValidatedSubject jwk compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
     validateJWSJWT defaultJWTValidationSettings jwk jwt
     return $ jwtClaimsSet jwt
-  case result of
-    Left e -> return (e :: JWTError) >> return Nothing
-    Right claims -> return $ claims^.claimSub >>= getString
+  return $ case result of
+    Left e -> Left $ pack $ show (e :: JWTError)
+    Right claims -> case claims^.claimSub of
+      Nothing -> Left "Claims set did not contain a subject claim"
+      Just sub -> case getString sub of
+        Nothing -> Left "Subject claim was a URI"
+        Just t -> Right t
