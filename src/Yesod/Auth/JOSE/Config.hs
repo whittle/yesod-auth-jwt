@@ -12,8 +12,7 @@ import Data.Aeson
 
 instance FromJSON JWTValidationSettings where
   parseJSON = withObject "JWTValidationSettings" $ \o -> do
-    aud <- fromString <$> o .: "audience"
-    iss <- fromString <$> o .: "issuer"
-    return $ jwtValidationSettingsAudiencePredicate .~ (== aud)
-           $ jwtValidationSettingsIssuerPredicate .~ (== iss)
-           $ defaultJWTValidationSettings
+    aud <- o .: "audience"
+    iss <- o .: "issuer"
+    return $ defaultJWTValidationSettings (== aud)
+           & jwtValidationSettingsIssuerPredicate .~ (== iss)

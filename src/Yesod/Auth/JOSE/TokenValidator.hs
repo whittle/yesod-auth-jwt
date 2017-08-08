@@ -21,15 +21,14 @@ extractValidatedSubject :: (Monad m, MonadTime m)
                         -> JWTValidationSettings
                         -> ByteString
                         -> HandlerT site m (Either Text Text)
-extractValidatedSubject jwk config compactToken = do
+extractValidatedSubject k config compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
-    validateJWSJWT config jwk jwt
-    return $ jwtClaimsSet jwt
+    verifyClaims config k jwt
   return $ case result of
     Left e -> Left $ pack $ show (e :: JWTError)
     Right claims -> case claims^.claimSub of
       Nothing -> Left "Claims set did not contain a subject claim"
-      Just sub -> case getString sub of
+      Just sub -> case sub ^? string of
         Nothing -> Left "Subject claim was a URI"
-        Just t -> Right t
+        Just s -> Right $ pack s

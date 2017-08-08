@@ -1,4 +1,4 @@
-resolver: lts-8.24
+resolver: lts-9.3
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -22,7 +22,7 @@ packages:
 - '.'
 - location:
     git: git@github.com:whittle/yesod-test-additional.git
-    commit: e99b229086e90c96a484b8cdc9af09d88ab69be2
+    commit: 0cab5c29b59d7ddca9edc82bb088f70ee0caa15a
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
