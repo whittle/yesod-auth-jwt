@@ -2,6 +2,7 @@
 
 module Yesod.Auth.JOSE.TokenValidator
        ( extractValidatedSubject
+       , extractValidatedSubject'
        ) where
 
 import           Control.Lens
@@ -22,6 +23,23 @@ extractValidatedSubject :: (Monad m, MonadTime m)
                         -> ByteString
                         -> HandlerT site m (Either Text Text)
 extractValidatedSubject k config compactToken = do
+  result <- runExceptT $ do
+    jwt <- decodeCompact $ fromStrict compactToken
+    verifyClaims config k jwt
+  return $ case result of
+    Left e -> Left $ pack $ show (e :: JWTError)
+    Right claims -> case claims^.claimSub of
+      Nothing -> Left "Claims set did not contain a subject claim"
+      Just sub -> case sub ^? string of
+        Nothing -> Left "Subject claim was a URI"
+        Just s -> Right $ pack s
+
+extractValidatedSubject' :: (Monad m, MonadTime m)
+                         => JWKSet
+                         -> JWTValidationSettings
+                         -> ByteString
+                         -> HandlerT site m (Either Text Text)
+extractValidatedSubject' k config compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
     verifyClaims config k jwt
