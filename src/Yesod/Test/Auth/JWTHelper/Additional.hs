@@ -2,6 +2,7 @@
 
 module Yesod.Test.Auth.JWTHelper.Additional
        ( requestWithSubject
+       , requestWithSubjectRSA
        ) where
 
 import           Control.Lens
@@ -9,7 +10,7 @@ import           Control.Monad.Trans.Except (runExceptT)
 import           Crypto.JOSE.Compact (encodeCompact)
 import qualified Crypto.JOSE.Error as J
 import           Crypto.JOSE.JWK (JWK)
-import           Crypto.JOSE.JWS (Alg(HS256), newJWSHeader)
+import           Crypto.JOSE.JWS (Alg(HS256, RS256), newJWSHeader)
 import qualified Crypto.JWT as J
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Lazy (toStrict)
@@ -29,6 +30,22 @@ requestWithSubject jwk subject builder = do
     let header = newJWSHeader ((), HS256)
         claims = claimSubject subject
     encodeCompact <$> J.signClaims jwk header claims
+  case result of
+    Left e -> assertFailure $ show (e :: J.Error)
+    Right compact -> Y.request $ do
+      Y.addRequestHeader $ bearerTokenAuthHeader $ toStrict compact
+      builder
+
+requestWithSubjectRSA :: Yesod site
+                      => JWK
+                      -> Text
+                      -> Y.RequestBuilder site ()
+                      -> Y.YesodExample site addl ()
+requestWithSubjectRSA k subject builder = do
+  result <- runExceptT $ do
+    let header = newJWSHeader ((), RS256)
+        claims = claimSubject subject
+    encodeCompact <$> J.signClaims k header claims
   case result of
     Left e -> assertFailure $ show (e :: J.Error)
     Right compact -> Y.request $ do
