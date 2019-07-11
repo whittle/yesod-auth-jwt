@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Yesod.Test.Auth.JWTHelper
@@ -19,7 +20,11 @@ import           Network.HTTP.Types.Header
 import           Yesod.Core (Yesod)
 import qualified Yesod.Test as Y
 
-requestWithSubject :: Yesod site => JWK -> Text -> Y.RequestBuilder site () -> Y.YesodExample site ()
+requestWithSubject :: (Yesod site, J.MonadRandom (Y.SIO (Y.YesodExampleData site)))
+                   => JWK
+                   -> Text
+                   -> Y.RequestBuilder site ()
+                   -> Y.YesodExample site ()
 requestWithSubject jwk subject builder = do
   result <- runExceptT $ do
     let header = newJWSHeader ((), HS256)

@@ -14,14 +14,14 @@ import           Crypto.JWT
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Lazy (fromStrict)
 import           Data.Text (pack, Text)
-import           Yesod.Core.Types (HandlerT)
+import           Yesod.Core (MonadHandler)
 
 
-extractValidatedSubject :: (Monad m, MonadTime m)
+extractValidatedSubject :: (MonadHandler m, MonadTime m)
                         => JWK
                         -> JWTValidationSettings
                         -> ByteString
-                        -> HandlerT site m (Either Text Text)
+                        -> m (Either Text Text)
 extractValidatedSubject k config compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
@@ -34,11 +34,11 @@ extractValidatedSubject k config compactToken = do
         Nothing -> Left "Subject claim was a URI"
         Just s -> Right $ pack s
 
-extractValidatedSubject' :: (Monad m, MonadTime m)
+extractValidatedSubject' :: (MonadHandler m, MonadTime m)
                          => JWKSet
                          -> JWTValidationSettings
                          -> ByteString
-                         -> HandlerT site m (Either Text Text)
+                         -> m (Either Text Text)
 extractValidatedSubject' k config compactToken = do
   result <- runExceptT $ do
     jwt <- decodeCompact $ fromStrict compactToken
