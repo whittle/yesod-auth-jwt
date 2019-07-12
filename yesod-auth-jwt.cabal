@@ -1,5 +1,5 @@
 name:                   yesod-auth-jwt
-version:                0.1.0.0
+version:                0.1.1.0
 synopsis:               Yesod authentication using JSON Web Tokens
 homepage:               https://github.com/whittle/yesod-auth-jwt
 license:                BSD3
