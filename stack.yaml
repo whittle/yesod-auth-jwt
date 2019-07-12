@@ -21,8 +21,8 @@ resolver: lts-11.22
 packages:
 - '.'
 - location:
-    git: git@github.com:whittle/yesod-test-additional.git
-    commit: 0cab5c29b59d7ddca9edc82bb088f70ee0caa15a
+    git: git@github.com:whittle/yesod-test-mocks.git
+    commit: e2e445f223d8c8b17b2a00f77b52b86a7d8edcc9
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver

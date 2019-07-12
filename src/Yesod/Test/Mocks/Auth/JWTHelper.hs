@@ -1,6 +1,7 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Yesod.Test.Auth.JWTHelper.Additional
+module Yesod.Test.Mocks.Auth.JWTHelper
        ( requestWithSubject
        , requestWithSubjectRSA
        ) where
@@ -18,9 +19,9 @@ import           Data.Monoid ((<>))
 import           Data.Text (Text)
 import           Network.HTTP.Types.Header
 import           Yesod.Core (Yesod)
-import qualified Yesod.Test.Additional as Y
+import qualified Yesod.Test.Mocks as Y
 
-requestWithSubject :: Yesod site
+requestWithSubject :: (Yesod site, J.MonadRandom (Y.SIO (Y.YesodExampleData site addl)))
                    => JWK
                    -> Text
                    -> Y.RequestBuilder site ()
@@ -36,7 +37,7 @@ requestWithSubject jwk subject builder = do
       Y.addRequestHeader $ bearerTokenAuthHeader $ toStrict compact
       builder
 
-requestWithSubjectRSA :: Yesod site
+requestWithSubjectRSA :: (Yesod site, J.MonadRandom (Y.SIO (Y.YesodExampleData site addl)))
                       => JWK
                       -> Text
                       -> Y.RequestBuilder site ()
