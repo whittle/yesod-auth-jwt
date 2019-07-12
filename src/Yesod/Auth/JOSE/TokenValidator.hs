@@ -32,7 +32,7 @@ extractValidatedSubject k config compactToken = do
       Nothing -> Left "Claims set did not contain a subject claim"
       Just sub -> case sub ^? string of
         Nothing -> Left "Subject claim was a URI"
-        Just s -> Right $ pack s
+        Just s -> Right s
 
 extractValidatedSubject' :: (MonadHandler m, MonadTime m)
                          => JWKSet
@@ -49,4 +49,4 @@ extractValidatedSubject' k config compactToken = do
       Nothing -> Left "Claims set did not contain a subject claim"
       Just sub -> case sub ^? string of
         Nothing -> Left "Subject claim was a URI"
-        Just s -> Right $ pack s
+        Just s -> Right s
